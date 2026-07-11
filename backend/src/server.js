@@ -24,15 +24,15 @@ app.use('/api/farmers', farmerRoutes);
 app.use('/api/coffee', coffeeRoutes); // 🟢 เปิดใช้งานเส้นทางกาแฟ
 
 // API สำหรับลบข้อมูลจัดซื้อ
-app.delete('/api/transactions/:id', async (req, res) => {
+app.delete('/api/coffee/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
-    // สั่งให้ Prisma ไปลบข้อมูลใน Database
-    // ⚠️ หมายเหตุ: เปลี่ยนคำว่า 'transaction' ให้ตรงกับชื่อตารางใน schema.prisma ของคุณนะครับ (เช่น record, order)
-    await prisma.transaction.delete({
+    // เปลี่ยนจาก prisma.transaction.delete เป็น prisma.coffee.delete
+    // ⚠️ หมายเหตุ: ถ้าในไฟล์ schema.prisma ของคุณตั้งชื่อโมเดลว่าอย่างอื่น (เช่น CoffeeLot) ให้เปลี่ยนคำว่า coffee เป็นชื่อนั้นครับ
+    await prisma.coffee.delete({
       where: { 
-        id: parseInt(id) // ถ้า id ในฐานข้อมูลของคุณเป็นตัวเลข (Int) ให้ใช้ parseInt แต่ถ้าเป็น String ปล่อยเป็น id เฉยๆ ได้เลย
+        id: parseInt(id) 
       }
     });
 
