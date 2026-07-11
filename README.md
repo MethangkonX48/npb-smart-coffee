@@ -26,7 +26,7 @@ npm run seed
 npm run dev
 ```
 
-จากนั้นเปิด `http://localhost:3000`
+จากนั้นเปิด `https://npb-smart-coffee-api.onrender.com`
 
 ## ผู้ใช้ตัวอย่าง
 

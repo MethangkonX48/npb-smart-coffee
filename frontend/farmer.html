@@ -97,7 +97,7 @@ async function fetchMyCoffeeData() {
 
             try {
                 const encodedName = encodeURIComponent(currentFarmer);
-                const response = await fetch(`http://localhost:3000/api/coffee/farmer/${encodedName}?t=` + new Date().getTime());
+                const response = await fetch(`https://npb-smart-coffee-api.onrender.com/api/coffee/farmer/${encodedName}?t=` + new Date().getTime());
                 
                 if (!response.ok) throw new Error('ไม่พบข้อมูลจากเซิร์ฟเวอร์');
 
