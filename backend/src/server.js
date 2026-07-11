@@ -23,6 +23,26 @@ app.use('/api/auth', authRoutes);
 app.use('/api/farmers', farmerRoutes);
 app.use('/api/coffee', coffeeRoutes); // 🟢 เปิดใช้งานเส้นทางกาแฟ
 
+// API สำหรับลบข้อมูลจัดซื้อ
+app.delete('/api/transactions/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // สั่งให้ Prisma ไปลบข้อมูลใน Database
+    // ⚠️ หมายเหตุ: เปลี่ยนคำว่า 'transaction' ให้ตรงกับชื่อตารางใน schema.prisma ของคุณนะครับ (เช่น record, order)
+    await prisma.transaction.delete({
+      where: { 
+        id: parseInt(id) // ถ้า id ในฐานข้อมูลของคุณเป็นตัวเลข (Int) ให้ใช้ parseInt แต่ถ้าเป็น String ปล่อยเป็น id เฉยๆ ได้เลย
+      }
+    });
+
+    res.json({ message: 'ลบข้อมูลสำเร็จเรียบร้อย!' });
+  } catch (error) {
+    console.error('Error deleting record:', error);
+    res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบข้อมูล' });
+  }
+});
+
 app.use(express.static(frontendPath));
 
 app.get('*', (req, res) => {
