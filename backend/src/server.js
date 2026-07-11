@@ -28,7 +28,7 @@ app.use('/api/farmers', farmerRoutes);
 app.use('/api/coffee', coffeeRoutes); // เปิดใช้งานเส้นทางกาแฟ
 
 // API สำหรับลบข้อมูลจัดซื้อ
-app.delete('/api/coffee/:id', async (req, res) => {
+app.delete('/api/coffeeLot/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
