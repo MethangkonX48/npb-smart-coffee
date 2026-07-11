@@ -11,7 +11,6 @@
 </head>
 <body>
 
-    <!-- แถบนำทาง (Navbar) -->
     <nav class="bg-orange-600 text-white p-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold"><i class="fas fa-search-plus mr-2"></i>ศูนย์ตรวจสอบคุณภาพ (QC)</h1>
@@ -31,7 +30,6 @@
             <p class="text-gray-600 mt-2">บันทึกรับวัตถุดิบและประเมินเกรดเมล็ดกาแฟอัตโนมัติ</p>
         </div>
 
-        <!-- กล่องสรุปข้อมูล (Summary Cards) -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-orange-500">
                 <div class="flex justify-between items-start">
@@ -66,7 +64,6 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- แบบฟอร์มบันทึกรับกาแฟ -->
             <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200 lg:col-span-1 h-fit">
                 <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-weight mr-2 text-orange-500"></i>บันทึกรับกาแฟ (Walk-in)</h3>
                 
@@ -76,7 +73,6 @@
                         <input type="text" id="farmerName" required class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="เช่น Pao">
                     </div>
                     
-                    <!-- 🟢 เพิ่ม Dropdown สำหรับเลือกชนิดกาแฟ -->
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">สายพันธุ์ / ชนิดกาแฟ</label>
                         <select id="coffeeType" class="shadow-sm border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white cursor-pointer">
@@ -102,7 +98,6 @@
                 </form>
             </div>
 
-            <!-- ตารางประวัติการรับกาแฟ -->
             <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200 lg:col-span-2">
                 <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-clipboard-list mr-2 text-blue-500"></i>ประวัติการตรวจรับล่าสุด</h3>
                 <div class="overflow-x-auto">
@@ -111,14 +106,15 @@
                             <tr>
                                 <th class="p-4 rounded-tl-lg">วันที่ / เวลา</th>
                                 <th class="p-4">เกษตรกร</th>
-                                <th class="p-4">ชนิดกาแฟ</th> <!-- 🟢 เพิ่มคอลัมน์ชนิดกาแฟ -->
+                                <th class="p-4">ชนิดกาแฟ</th>
                                 <th class="p-4 text-right">น้ำหนัก (กก.)</th>
                                 <th class="p-4 text-center">ความชื้น</th>
-                                <th class="p-4 text-center rounded-tr-lg">สถานะประเมิน</th>
+                                <th class="p-4 text-center">สถานะประเมิน</th>
+                                <th class="p-4 text-center rounded-tr-lg">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody id="coffeeTableBody" class="divide-y divide-gray-100">
-                            <tr><td colspan="6" class="p-4 text-center text-gray-500">กำลังโหลดข้อมูล...</td></tr>
+                            <tr><td colspan="7" class="p-4 text-center text-gray-500">กำลังโหลดข้อมูล...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -141,7 +137,7 @@
                 tableBody.innerHTML = '';
                 
                 if (lots.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-500">ยังไม่มีประวัติการรับกาแฟในระบบ</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-gray-500">ยังไม่มีประวัติการรับกาแฟในระบบ</td></tr>';
                     return;
                 }
 
@@ -163,7 +159,6 @@
                         statusBadge = '<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm">รอตรวจ</span>';
                     }
 
-                    // 🟢 ดึงข้อมูล lot.coffeeType มาแสดง (ถ้าของเก่าไม่มีจะขึ้นว่า 'ไม่ระบุ')
                     const typeDisplay = lot.coffeeType || 'ไม่ระบุ';
 
                     const tr = document.createElement('tr');
@@ -175,6 +170,11 @@
                         <td class="p-4 text-right font-bold text-blue-600">${lot.weight.toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
                         <td class="p-4 text-center font-semibold">${lot.moisture ? lot.moisture + '%' : '-'}</td>
                         <td class="p-4 text-center">${statusBadge}</td>
+                        <td class="p-4 text-center">
+                            <button onclick="deleteRecord(${lot.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm shadow-sm transition">
+                                <i class="fas fa-trash-alt"></i> ลบ
+                            </button>
+                        </td>
                     `;
                     tableBody.appendChild(tr);
                 });
@@ -185,7 +185,7 @@
 
             } catch (error) {
                 console.error('Error fetching lots:', error);
-                tableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">ดึงข้อมูลล้มเหลว</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-red-500">ดึงข้อมูลล้มเหลว</td></tr>';
             }
         }
 
@@ -193,7 +193,7 @@
             event.preventDefault(); 
             
             const farmerName = document.getElementById('farmerName').value;
-            const coffeeType = document.getElementById('coffeeType').value; // 🟢 ดึงค่าชนิดกาแฟ
+            const coffeeType = document.getElementById('coffeeType').value;
             const weight = parseFloat(document.getElementById('weight').value);
             const moisture = parseFloat(document.getElementById('moisture').value);
 
@@ -210,7 +210,7 @@
                 const response = await fetch('https://npb-smart-coffee-api.onrender.com/api/coffee', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ farmerName, coffeeType, weight, moisture }) // 🟢 ส่งค่า coffeeType ไปให้ Backend
+                    body: JSON.stringify({ farmerName, coffeeType, weight, moisture })
                 });
 
                 const data = await response.json();
@@ -225,6 +225,31 @@
             } catch (error) {
                 console.error('Error:', error);
                 alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+            }
+        }
+
+        // 🟢 ฟังก์ชันลบข้อมูลที่แก้ไข URL ให้ชี้ไปที่ Render เรียบร้อยแล้ว
+        async function deleteRecord(id) {
+            const isConfirm = confirm('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลรายการนี้? (ลบแล้วกู้คืนไม่ได้นะครับ)');
+            
+            if (!isConfirm) return;
+
+            try {
+                // เปลี่ยนลิงก์ให้ตรงกับ API ลบที่อยู่บน Render ของคุณ
+                const response = await fetch(`https://npb-smart-coffee-api.onrender.com/api/transactions/${id}`, { 
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    alert('ลบข้อมูลสำเร็จ!');
+                    fetchCoffeeLots(); // สั่งให้ตารางรีเฟรชข้อมูลใหม่ทันที โดยไม่ต้อง F5
+                } else {
+                    const data = await response.json();
+                    alert(`ลบไม่สำเร็จ: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ครับ');
             }
         }
 
