@@ -3,9 +3,13 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+// 🟢 สิ่งที่ขาดไป! เพิ่ม 2 บรรทัดนี้เพื่อให้ server.js รู้จัก Prisma คอยจัดการฐานข้อมูล
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
 const authRoutes = require('./routes/authRoutes');
 const farmerRoutes = require('./routes/farmerRoutes');
-const coffeeRoutes = require('./routes/coffeeRoutes'); // 🟢 เพิ่มเส้นทางกาแฟ
+const coffeeRoutes = require('./routes/coffeeRoutes'); // เพิ่มเส้นทางกาแฟ
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -21,15 +25,15 @@ app.get('/health', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/farmers', farmerRoutes);
-app.use('/api/coffee', coffeeRoutes); // 🟢 เปิดใช้งานเส้นทางกาแฟ
+app.use('/api/coffee', coffeeRoutes); // เปิดใช้งานเส้นทางกาแฟ
 
 // API สำหรับลบข้อมูลจัดซื้อ
 app.delete('/api/coffee/:id', async (req, res) => {
   try {
     const { id } = req.params;
     
-    // เปลี่ยนจาก prisma.transaction.delete เป็น prisma.coffee.delete
-    // ⚠️ หมายเหตุ: ถ้าในไฟล์ schema.prisma ของคุณตั้งชื่อโมเดลว่าอย่างอื่น (เช่น CoffeeLot) ให้เปลี่ยนคำว่า coffee เป็นชื่อนั้นครับ
+    // ⚠️ ถ้ามันยัง Error อยู่ แสดงว่าชื่อตารางในฐานข้อมูลไม่ได้ชื่อ coffee
+    // ลองเช็คไฟล์ schema.prisma ดูครับว่า model ชื่ออะไร แล้วเปลี่ยนตรงนี้ให้ตรงกัน
     await prisma.coffee.delete({
       where: { 
         id: parseInt(id) 
