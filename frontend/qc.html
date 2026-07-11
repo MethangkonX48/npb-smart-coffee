@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตรวจสอบคุณภาพ (QC) | NPB Smart Coffee</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }</style>
+</head>
+<body>
+
+    <!-- แถบนำทาง (Navbar) -->
+    <nav class="bg-orange-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold"><i class="fas fa-search-plus mr-2"></i>ศูนย์ตรวจสอบคุณภาพ (QC)</h1>
+            <div class="flex items-center gap-4">
+                <span><i class="fas fa-user-check mr-2"></i>เจ้าหน้าที่ QC</span>
+                <button onclick="localStorage.clear(); window.location.href='index.html';" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-sm text-white transition shadow">
+                    <i class="fas fa-sign-out-alt mr-1"></i> ออกจากระบบ
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto mt-8 p-4">
+        
+        <div class="mb-6">
+            <h2 class="text-3xl font-bold text-gray-800">แดชบอร์ดตรวจสอบคุณภาพ</h2>
+            <p class="text-gray-600 mt-2">บันทึกรับวัตถุดิบและประเมินเกรดเมล็ดกาแฟอัตโนมัติ</p>
+        </div>
+
+        <!-- กล่องสรุปข้อมูล (Summary Cards) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-orange-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-gray-500 text-sm font-semibold">จำนวนคิวที่ตรวจทั้งหมด</h3>
+                        <p id="qcTotalLots" class="text-3xl font-bold text-gray-800 mt-2">0 <span class="text-sm font-normal text-gray-500">คิว</span></p>
+                    </div>
+                    <div class="p-3 bg-orange-50 rounded-full text-orange-500"><i class="fas fa-clipboard-check text-xl"></i></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-green-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-gray-500 text-sm font-semibold">ปริมาณกาแฟที่ผ่านเกณฑ์</h3>
+                        <p id="qcApprovedWeight" class="text-3xl font-bold text-gray-800 mt-2">0.00 <span class="text-sm font-normal text-gray-500">กก.</span></p>
+                    </div>
+                    <div class="p-3 bg-green-50 rounded-full text-green-500"><i class="fas fa-check-circle text-xl"></i></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-red-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-gray-500 text-sm font-semibold">รายการที่ไม่ผ่านเกณฑ์</h3>
+                        <p id="qcRejectedLots" class="text-3xl font-bold text-red-600 mt-2">0 <span class="text-sm font-normal text-gray-500">คิว</span></p>
+                    </div>
+                    <div class="p-3 bg-red-50 rounded-full text-red-600"><i class="fas fa-times-circle text-xl"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- แบบฟอร์มบันทึกรับกาแฟ -->
+            <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200 lg:col-span-1 h-fit">
+                <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-weight mr-2 text-orange-500"></i>บันทึกรับกาแฟ (Walk-in)</h3>
+                
+                <form id="qcForm" onsubmit="submitCoffeeLot(event)">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">ชื่อเกษตรกร / รหัสผู้ส่ง</label>
+                        <input type="text" id="farmerName" required class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="เช่น Pao">
+                    </div>
+                    
+                    <!-- 🟢 เพิ่ม Dropdown สำหรับเลือกชนิดกาแฟ -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">สายพันธุ์ / ชนิดกาแฟ</label>
+                        <select id="coffeeType" class="shadow-sm border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white cursor-pointer">
+                            <option value="อาราบิก้า (Arabica)">อาราบิก้า (Arabica)</option>
+                            <option value="โรบัสต้า (Robusta)">โรบัสต้า (Robusta)</option>
+                            <option value="พีเบอร์รี่ (Peaberry)">พีเบอร์รี่ (Peaberry)</option>
+                            <option value="ผสม (Blend)">ผสม (Blend)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">น้ำหนักกาแฟ (กิโลกรัม)</label>
+                        <input type="number" step="0.01" id="weight" min="1" max="10000" required class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="สูงสุดไม่เกิน 10,000">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">ค่าความชื้น (%)</label>
+                        <input type="number" step="0.1" id="moisture" min="1" max="100" required class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="ระบุ 1 - 100">
+                        <p class="text-xs text-gray-500 mt-2"><i class="fas fa-info-circle mr-1"></i><= 12% ถือว่าผ่านเกณฑ์</p>
+                    </div>
+                    <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded shadow transition flex justify-center items-center">
+                        <i class="fas fa-save mr-2"></i> บันทึกและประเมินเกรด
+                    </button>
+                </form>
+            </div>
+
+            <!-- ตารางประวัติการรับกาแฟ -->
+            <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200 lg:col-span-2">
+                <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-clipboard-list mr-2 text-blue-500"></i>ประวัติการตรวจรับล่าสุด</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-gray-50 text-gray-600">
+                            <tr>
+                                <th class="p-4 rounded-tl-lg">วันที่ / เวลา</th>
+                                <th class="p-4">เกษตรกร</th>
+                                <th class="p-4">ชนิดกาแฟ</th> <!-- 🟢 เพิ่มคอลัมน์ชนิดกาแฟ -->
+                                <th class="p-4 text-right">น้ำหนัก (กก.)</th>
+                                <th class="p-4 text-center">ความชื้น</th>
+                                <th class="p-4 text-center rounded-tr-lg">สถานะประเมิน</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coffeeTableBody" class="divide-y divide-gray-100">
+                            <tr><td colspan="6" class="p-4 text-center text-gray-500">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchCoffeeLots() {
+            const tableBody = document.getElementById('coffeeTableBody');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/coffee?t=' + new Date().getTime());
+                const lots = await response.json();
+                
+                let totalLots = lots.length;
+                let approvedWeight = 0;
+                let rejectedLots = 0;
+
+                tableBody.innerHTML = '';
+                
+                if (lots.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-500">ยังไม่มีประวัติการรับกาแฟในระบบ</td></tr>';
+                    return;
+                }
+
+                lots.forEach(lot => {
+                    const date = new Date(lot.createdAt).toLocaleString('th-TH');
+                    
+                    if (lot.status === 'APPROVED' || lot.status === 'PAID') {
+                        approvedWeight += lot.weight;
+                    } else if (lot.status === 'REJECTED') {
+                        rejectedLots += 1;
+                    }
+
+                    let statusBadge = '';
+                    if (lot.status === 'APPROVED' || lot.status === 'PAID') {
+                        statusBadge = '<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm"><i class="fas fa-check-circle mr-1"></i>ผ่านเกณฑ์</span>';
+                    } else if (lot.status === 'REJECTED') {
+                        statusBadge = '<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm"><i class="fas fa-times-circle mr-1"></i>ไม่ผ่าน</span>';
+                    } else {
+                        statusBadge = '<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm">รอตรวจ</span>';
+                    }
+
+                    // 🟢 ดึงข้อมูล lot.coffeeType มาแสดง (ถ้าของเก่าไม่มีจะขึ้นว่า 'ไม่ระบุ')
+                    const typeDisplay = lot.coffeeType || 'ไม่ระบุ';
+
+                    const tr = document.createElement('tr');
+                    tr.classList.add('hover:bg-gray-50', 'transition');
+                    tr.innerHTML = `
+                        <td class="p-4 text-gray-600">${date}</td>
+                        <td class="p-4 font-medium text-gray-800">${lot.farmerName}</td>
+                        <td class="p-4 text-gray-600 text-xs">${typeDisplay}</td>
+                        <td class="p-4 text-right font-bold text-blue-600">${lot.weight.toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
+                        <td class="p-4 text-center font-semibold">${lot.moisture ? lot.moisture + '%' : '-'}</td>
+                        <td class="p-4 text-center">${statusBadge}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+                document.getElementById('qcTotalLots').innerHTML = `${totalLots.toLocaleString('th-TH')} <span class="text-sm font-normal text-gray-500">คิว</span>`;
+                document.getElementById('qcApprovedWeight').innerHTML = `${approvedWeight.toLocaleString('th-TH', {minimumFractionDigits: 2})} <span class="text-sm font-normal text-gray-500">กก.</span>`;
+                document.getElementById('qcRejectedLots').innerHTML = `${rejectedLots.toLocaleString('th-TH')} <span class="text-sm font-normal text-gray-500">คิว</span>`;
+
+            } catch (error) {
+                console.error('Error fetching lots:', error);
+                tableBody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-500">ดึงข้อมูลล้มเหลว</td></tr>';
+            }
+        }
+
+        async function submitCoffeeLot(event) {
+            event.preventDefault(); 
+            
+            const farmerName = document.getElementById('farmerName').value;
+            const coffeeType = document.getElementById('coffeeType').value; // 🟢 ดึงค่าชนิดกาแฟ
+            const weight = parseFloat(document.getElementById('weight').value);
+            const moisture = parseFloat(document.getElementById('moisture').value);
+
+            if (weight > 10000 || weight <= 0) {
+                alert("กรุณาระบุน้ำหนักให้ถูกต้อง (ไม่เกิน 10,000 กก.)");
+                return;
+            }
+            if (moisture > 100 || moisture < 1) {
+                alert("กรุณาระบุความชื้นที่ถูกต้อง (1% - 100%)");
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/coffee', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ farmerName, coffeeType, weight, moisture }) // 🟢 ส่งค่า coffeeType ไปให้ Backend
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('บันทึกข้อมูลและประเมินเกรดสำเร็จ!');
+                    document.getElementById('qcForm').reset(); 
+                    fetchCoffeeLots(); 
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', fetchCoffeeLots);
+    </script>
+</body>
+</html>

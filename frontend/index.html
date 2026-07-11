@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เข้าสู่ระบบ | NPB Smart Coffee Procurement</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    body {
+      font-family: Tahoma, Arial, sans-serif;
+      background: #f7f5ef;
+    }
+
+    .coffee-visual {
+      background-image:
+        linear-gradient(135deg, rgba(17, 24, 39, 0.86), rgba(22, 101, 52, 0.72)),
+        url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1400&q=80');
+      background-position: center;
+      background-size: cover;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-900">
+  <main class="min-h-screen grid lg:grid-cols-[1.05fr_0.95fr]">
+    <section class="coffee-visual min-h-[42vh] lg:min-h-screen text-white flex items-end">
+      <div class="w-full p-6 sm:p-10 lg:p-14">
+        <div class="max-w-xl">
+          <p class="text-sm font-semibold uppercase">NPB Smart Coffee Procurement</p>
+          <h1 class="mt-4 text-3xl sm:text-5xl font-bold leading-tight">ศูนย์กลางจัดซื้อกาแฟอัจฉริยะ</h1>
+          <p class="mt-5 text-base sm:text-lg text-white/86 leading-8">
+            เข้าสู่ระบบเพื่อจัดการข้อมูลเกษตรกร ตรวจรับวัตถุดิบ และติดตามกระบวนการจัดซื้อในที่เดียว
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="flex items-center justify-center px-5 py-10 sm:px-8">
+      <div class="w-full max-w-md">
+        <div class="mb-8">
+          <p class="text-sm font-semibold text-emerald-700">ระบบภายใน</p>
+          <h2 class="mt-2 text-3xl font-bold">เข้าสู่ระบบ</h2>
+          <p class="mt-3 text-slate-600 leading-7">กรอกบัญชีที่ได้รับมอบหมายเพื่อเข้าสู่หน้าตามบทบาทของคุณ</p>
+        </div>
+
+        <form id="loginForm" class="bg-white border border-slate-200 rounded-lg shadow-sm p-5 sm:p-6" autocomplete="off">
+          <div class="space-y-5">
+            <label class="block">
+              <span class="text-sm font-semibold text-slate-700">ชื่อผู้ใช้</span>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                class="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
+                placeholder="เช่น farmer01"
+              />
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-semibold text-slate-700">รหัสผ่าน</span>
+              <div class="mt-2 relative">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  class="w-full rounded-lg border border-slate-300 px-4 py-3 pr-12 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
+                  placeholder="กรอกรหัสผ่าน"
+                />
+                <button
+                  id="togglePassword"
+                  type="button"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-slate-100"
+                  aria-label="แสดงหรือซ่อนรหัสผ่าน"
+                  title="แสดงหรือซ่อนรหัสผ่าน"
+                >
+                  <i data-lucide="eye" class="h-5 w-5"></i>
+                </button>
+              </div>
+            </label>
+          </div>
+
+          <div id="messageBox" class="mt-5 hidden rounded-lg border px-4 py-3 text-sm leading-6"></div>
+
+          <button
+            id="loginButton"
+            type="submit"
+            class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-700 px-4 py-3 font-semibold text-white transition hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-200 disabled:cursor-not-allowed disabled:bg-slate-400"
+          >
+            <i data-lucide="log-in" class="h-5 w-5"></i>
+            <span>เข้าสู่ระบบ</span>
+          </button>
+        </form>
+
+        <div class="mt-5 rounded-lg border border-slate-200 bg-white p-4">
+          <p class="text-sm font-semibold text-slate-700">บัญชีตัวอย่าง</p>
+          <div class="mt-3 grid gap-2 sm:grid-cols-3">
+            <button type="button" data-demo-username="farmer01" data-demo-password="farmer123" class="demo-account rounded-lg border border-slate-200 px-3 py-2 text-sm hover:border-emerald-500 hover:bg-emerald-50">เกษตรกร</button>
+            <button type="button" data-demo-username="qc01" data-demo-password="qc123" class="demo-account rounded-lg border border-slate-200 px-3 py-2 text-sm hover:border-emerald-500 hover:bg-emerald-50">ตรวจคุณภาพ</button>
+            <button type="button" data-demo-username="exec01" data-demo-password="exec123" class="demo-account rounded-lg border border-slate-200 px-3 py-2 text-sm hover:border-emerald-500 hover:bg-emerald-50">ผู้บริหาร</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const apiBaseUrl = window.location.protocol === 'file:' ? 'http://localhost:3000/api' : `${window.location.origin}/api`;
+    const roleRoutes = {
+      FARMER: 'farmer.html',
+      QC_STAFF: 'qc.html',
+      EXECUTIVE: 'executive.html'
+    };
+
+    const form = document.getElementById('loginForm');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const loginButton = document.getElementById('loginButton');
+    const messageBox = document.getElementById('messageBox');
+    const togglePassword = document.getElementById('togglePassword');
+
+    function showMessage(type, text) {
+      messageBox.className = 'mt-5 rounded-lg border px-4 py-3 text-sm leading-6';
+
+      if (type === 'error') {
+        messageBox.classList.add('border-red-200', 'bg-red-50', 'text-red-700');
+      } else {
+        messageBox.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-700');
+      }
+
+      messageBox.textContent = text;
+    }
+
+    function setLoading(isLoading) {
+      loginButton.disabled = isLoading;
+      loginButton.querySelector('span').textContent = isLoading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ';
+    }
+
+    function redirectByRole(role) {
+      const route = roleRoutes[role];
+
+      if (!route) {
+        showMessage('error', 'ไม่พบบบทบาทผู้ใช้ที่รองรับในระบบ');
+        return;
+      }
+
+      window.location.href = route;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      setLoading(true);
+      showMessage('success', 'กำลังตรวจสอบบัญชีผู้ใช้');
+
+      try {
+        const response = await fetch(`${apiBaseUrl}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: usernameInput.value.trim(),
+            password: passwordInput.value
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'เข้าสู่ระบบไม่สำเร็จ');
+        }
+
+        localStorage.setItem('npb_token', result.token);
+        localStorage.setItem('npb_role', result.role);
+        localStorage.setItem('npb_user', JSON.stringify(result.user));
+        
+        // 🟢 บรรทัดสำคัญที่เพิ่มเข้ามาเพื่อส่งชื่อผู้ใช้
+        localStorage.setItem('username', result.user.username);
+
+        showMessage('success', 'เข้าสู่ระบบสำเร็จ กำลังเปิดหน้าของคุณ');
+        redirectByRole(result.role);
+      } catch (error) {
+        showMessage('error', error.message || 'เชื่อมต่อระบบไม่ได้ กรุณาลองใหม่อีกครั้ง');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    togglePassword.addEventListener('click', () => {
+      const shouldShowPassword = passwordInput.type === 'password';
+      passwordInput.type = shouldShowPassword ? 'text' : 'password';
+      togglePassword.innerHTML = shouldShowPassword
+        ? '<i data-lucide="eye-off" class="h-5 w-5"></i>'
+        : '<i data-lucide="eye" class="h-5 w-5"></i>';
+      lucide.createIcons();
+    });
+
+    document.querySelectorAll('.demo-account').forEach((button) => {
+      button.addEventListener('click', () => {
+        usernameInput.value = button.dataset.demoUsername;
+        passwordInput.value = button.dataset.demoPassword;
+        usernameInput.focus();
+      });
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      const existingToken = localStorage.getItem('npb_token');
+      const existingRole = localStorage.getItem('npb_role');
+
+      if (existingToken && existingRole) {
+        redirectByRole(existingRole);
+      }
+    });
+  </script>
+</body>
+</html>

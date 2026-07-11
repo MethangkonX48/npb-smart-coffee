@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  FARMER
+  QC_STAFF
+  EXECUTIVE
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  fullName     String
+  role         Role
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ตารางสำหรับเก็บข้อมูลล็อตกาแฟที่นำมาส่ง (Phase 5)
+model CoffeeLot {
+  id         Int      @id @default(autoincrement())
+  farmerName String
+  weight     Float
+  moisture   Float
+  status     String   @default("PENDING")
+  // 🟢 บรรทัดที่เพิ่มเข้ามาใหม่ (ใส่ @default เพื่อไม่ให้ข้อมูลเก่าพัง)
+  coffeeType String   @default("ไม่ระบุ") 
+  createdAt  DateTime @default(now())
+}

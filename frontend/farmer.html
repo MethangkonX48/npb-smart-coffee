@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPB Smart Coffee (ระบบเกษตรกร)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }</style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="bg-green-800 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold"><i class="fas fa-leaf mr-2"></i>NPB Smart Coffee (ระบบเกษตรกร)</h1>
+            <div class="flex items-center gap-4">
+                <span><i class="fas fa-user-circle mr-2"></i>คุณ <span id="farmerNameDisplay"></span></span>
+                <button onclick="localStorage.clear(); window.location.href='index.html';" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-sm text-white transition shadow">
+                    <i class="fas fa-sign-out-alt mr-1"></i> ออกจากระบบ
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto mt-8 p-4">
+        
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-800">ยินดีต้อนรับกลับเข้าสู่ระบบ!</h2>
+            <p class="text-gray-600 mt-2">ตรวจสอบประวัติการส่งมอบ สรุปรายได้ และผลการประเมินคุณภาพเมล็ดกาแฟของคุณ</p>
+        </div>
+
+        <!-- 🟢 1. เพิ่มกล่องสรุปข้อมูล (Summary Cards) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-blue-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-gray-500 text-sm font-semibold">จำนวนครั้งที่ส่งมอบ</h3>
+                        <p id="summaryTotalLots" class="text-3xl font-bold text-gray-800 mt-2">0 <span class="text-sm font-normal text-gray-500">ครั้ง</span></p>
+                    </div>
+                    <div class="p-3 bg-blue-50 rounded-full text-blue-500"><i class="fas fa-truck text-xl"></i></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-green-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-gray-500 text-sm font-semibold">น้ำหนักที่ผ่านเกณฑ์รวม</h3>
+                        <p id="summaryTotalWeight" class="text-3xl font-bold text-gray-800 mt-2">0.00 <span class="text-sm font-normal text-gray-500">กก.</span></p>
+                    </div>
+                    <div class="p-3 bg-green-50 rounded-full text-green-500"><i class="fas fa-balance-scale text-xl"></i></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-yellow-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-gray-500 text-sm font-semibold">รายได้ประเมิน (รอรับ + รับแล้ว)</h3>
+                        <p id="summaryTotalIncome" class="text-3xl font-bold text-yellow-600 mt-2">฿ 0.00</p>
+                    </div>
+                    <div class="p-3 bg-yellow-50 rounded-full text-yellow-600"><i class="fas fa-coins text-xl"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. ตารางประวัติ (ดีไซน์เดิม แต่เพิ่มเงาสวยๆ) -->
+        <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+            <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-history mr-2 text-green-600"></i>ประวัติการส่งมอบกาแฟของคุณ</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-gray-50 text-gray-600">
+                        <tr>
+                            <th class="p-4 rounded-tl-lg">วันที่ / เวลา ที่ส่ง</th>
+                            <th class="p-4 text-center">สายพันธุ์</th>
+                            <th class="p-4 text-right">น้ำหนักรวม (กก.)</th>
+                            <th class="p-4 text-center">ค่าความชื้นที่วัดได้</th>
+                            <th class="p-4 text-center rounded-tr-lg">ผลการตรวจสอบ (QC)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="myCoffeeTableBody" class="divide-y divide-gray-100">
+                        <tr><td colspan="4" class="p-4 text-center text-gray-500">กำลังโหลดข้อมูล...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+async function fetchMyCoffeeData() {
+            const tableBody = document.getElementById('myCoffeeTableBody');
+            const nameDisplay = document.getElementById('farmerNameDisplay');
+            
+            const currentFarmer = localStorage.getItem('username') || 'เกษตรกร';
+            nameDisplay.textContent = currentFarmer;
+
+            try {
+                const encodedName = encodeURIComponent(currentFarmer);
+                const response = await fetch(`http://localhost:3000/api/coffee/farmer/${encodedName}?t=` + new Date().getTime());
+                
+                if (!response.ok) throw new Error('ไม่พบข้อมูลจากเซิร์ฟเวอร์');
+
+                const lots = await response.json();
+                
+                let totalLotsCount = lots.length;
+                let totalApprovedWeight = 0;
+                let totalIncome = 0;
+
+                tableBody.innerHTML = '';
+                
+                if (lots.length === 0) {
+                    // 🟢 เปลี่ยน colspan เป็น 5
+                    tableBody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-gray-500">คุณยังไม่มีประวัติการส่งกาแฟในระบบ</td></tr>';
+                    document.getElementById('summaryTotalLots').innerHTML = `0 <span class="text-sm font-normal text-gray-500">ครั้ง</span>`;
+                    return;
+                }
+
+                lots.forEach(lot => {
+                    const date = new Date(lot.createdAt).toLocaleString('th-TH');
+                    
+                    if (lot.status === 'APPROVED' || lot.status === 'PAID') {
+                        totalApprovedWeight += lot.weight;
+                        totalIncome += (lot.weight * 20); 
+                    }
+
+                    let statusBadge = '';
+                    if (lot.status === 'PAID') {
+                        statusBadge = '<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm"><i class="fas fa-check-double mr-1"></i>รับเงินแล้ว</span>';
+                    } else if (lot.status === 'APPROVED') {
+                        statusBadge = '<span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm"><i class="fas fa-check-circle mr-1"></i>ผ่านเกณฑ์ (รอจ่าย)</span>';
+                    } else if (lot.status === 'REJECTED') {
+                        statusBadge = '<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm"><i class="fas fa-times-circle mr-1"></i>ไม่ผ่านเกณฑ์</span>';
+                    } else {
+                        statusBadge = '<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm">กำลังตรวจสอบ</span>';
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.classList.add('hover:bg-gray-50', 'transition');
+                    tr.innerHTML = `
+                        <td class="p-4 text-gray-600">${date}</td>
+                        <td class="p-4 text-center text-gray-600">${lot.coffeeType || 'อาราบิก้า'}</td> <td class="p-4 text-right font-bold text-gray-800">${lot.weight.toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
+                        <td class="p-4 text-center font-semibold text-blue-600">${lot.moisture ? lot.moisture + '%' : '-'}</td>
+                        <td class="p-4 text-center">${statusBadge}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+                document.getElementById('summaryTotalLots').innerHTML = `${totalLotsCount.toLocaleString('th-TH')} <span class="text-sm font-normal text-gray-500">ครั้ง</span>`;
+                document.getElementById('summaryTotalWeight').innerHTML = `${totalApprovedWeight.toLocaleString('th-TH', {minimumFractionDigits: 2})} <span class="text-sm font-normal text-gray-500">กก.</span>`;
+                document.getElementById('summaryTotalIncome').innerHTML = `฿ ${totalIncome.toLocaleString('th-TH', {minimumFractionDigits: 2})}`;
+
+            } catch (error) {
+                console.error('Error:', error);
+                tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500"><i class="fas fa-exclamation-triangle mr-2"></i> ${error.message}</td></tr>`;
+            }
+        }
+        
+        window.addEventListener('DOMContentLoaded', fetchMyCoffeeData);
+    </script>
+</body>
+</html>

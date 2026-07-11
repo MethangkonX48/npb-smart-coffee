@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผู้บริหาร | NPB Smart Coffee</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- 🟢 เพิ่ม Chart.js สำหรับวาดกราฟ -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }</style>
+</head>
+<body>
+
+    <nav class="bg-slate-800 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold"><i class="fas fa-chart-line mr-2"></i>ศูนย์บริหารจัดการ (Executive Dashboard)</h1>
+            <div class="flex items-center gap-4">
+                <span><i class="fas fa-user-tie mr-2"></i><span id="execNameDisplay">ผู้บริหาร</span></span>
+                <button onclick="localStorage.clear(); window.location.href='index.html';" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-sm text-white transition shadow">
+                    <i class="fas fa-sign-out-alt mr-1"></i> ออกจากระบบ
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto mt-6 p-4">
+        
+        <!-- 🟢 1. Summary Cards (ปรับเป็น 4 กล่อง) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-blue-500 flex justify-between items-center">
+                <div>
+                    <h3 class="text-gray-500 text-xs font-semibold">เกษตรกรในระบบ</h3>
+                    <p id="totalFarmersCount" class="text-2xl font-bold text-gray-800 mt-1">0 <span class="text-xs font-normal text-gray-500">ราย</span></p>
+                </div>
+                <div class="bg-blue-50 p-3 rounded-full text-blue-500"><i class="fas fa-users fa-lg"></i></div>
+            </div>
+            
+            <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-yellow-500 flex justify-between items-center">
+                <div>
+                    <h3 class="text-gray-500 text-xs font-semibold">รออนุมัติสั่งซื้อ (Pending)</h3>
+                    <p id="totalPRCount" class="text-2xl font-bold text-gray-800 mt-1">0 <span class="text-xs font-normal text-gray-500">รายการ</span></p>
+                </div>
+                <div class="bg-yellow-50 p-3 rounded-full text-yellow-600"><i class="fas fa-clipboard-list fa-lg"></i></div>
+            </div>
+
+            <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-orange-500 flex justify-between items-center">
+                <div>
+                    <h3 class="text-gray-500 text-xs font-semibold">ปริมาณรับซื้อรวม (ผ่านเกณฑ์)</h3>
+                    <p id="totalWeightCount" class="text-2xl font-bold text-gray-800 mt-1">0 <span class="text-xs font-normal text-gray-500">กก.</span></p>
+                </div>
+                <div class="bg-orange-50 p-3 rounded-full text-orange-500"><i class="fas fa-weight-hanging fa-lg"></i></div>
+            </div>
+
+            <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-green-500 flex justify-between items-center">
+                <div>
+                    <h3 class="text-gray-500 text-xs font-semibold">ยอดจ่ายเงินแล้ว (Paid)</h3>
+                    <p id="totalPaidCount" class="text-2xl font-bold text-green-600 mt-1">฿ 0</p>
+                </div>
+                <div class="bg-green-50 p-3 rounded-full text-green-600"><i class="fas fa-money-check-alt fa-lg"></i></div>
+            </div>
+        </div>
+
+        <!-- 🟢 2. Charts Section (กราฟวิเคราะห์ข้อมูล) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                <h3 class="text-sm font-bold text-gray-700 mb-4 text-center"><i class="fas fa-chart-pie mr-2 text-orange-500"></i>สัดส่วนปริมาณรับซื้อแยกตามสายพันธุ์ (กก.)</h3>
+                <div class="relative h-48 w-full flex justify-center">
+                    <canvas id="typeChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                <h3 class="text-sm font-bold text-gray-700 mb-4 text-center"><i class="fas fa-chart-bar mr-2 text-blue-500"></i>ภาพรวมกระแสเงินสด (บาท)</h3>
+                <div class="relative h-48 w-full flex justify-center">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Tables Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            
+            <!-- ทะเบียนเกษตรกร -->
+            <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200 flex flex-col h-[400px]">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-800"><i class="fas fa-address-book mr-2 text-blue-500"></i>ทะเบียนเกษตรกร</h3>
+                    <button onclick="openModal()" class="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 shadow transition"><i class="fas fa-plus mr-1"></i> เพิ่ม</button>
+                </div>
+                <!-- 🟢 ช่องค้นหาเกษตรกร -->
+                <input type="text" id="searchFarmer" onkeyup="filterFarmers()" placeholder="ค้นหาชื่อเกษตรกร..." class="mb-4 p-2 border rounded text-sm w-full focus:ring-2 focus:ring-blue-400 outline-none">
+                
+                <div class="overflow-y-auto flex-1 border-t">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-gray-50 text-gray-600 sticky top-0">
+                            <tr><th class="p-3">รหัส</th><th class="p-3">ชื่อบัญชี</th><th class="p-3 text-right">จัดการ</th></tr>
+                        </thead>
+                        <tbody id="farmerTableBody" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- อนุมัติจัดซื้อ (Matching) -->
+            <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200 flex flex-col h-[400px]">
+                <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fas fa-clipboard-check mr-2 text-yellow-500"></i>รายการจัดซื้อ (Matching)</h3>
+                <div class="overflow-y-auto flex-1 border-t">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-gray-50 text-gray-600 sticky top-0">
+                            <tr>
+                                <th class="p-3">เลขที่</th>
+                                <th class="p-3">ผู้เสนอขาย</th>
+                                <th class="p-3 text-center">สายพันธุ์</th>
+                                <th class="p-3 text-right">ยอดเงิน</th>
+                                <th class="p-3 text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prTableBody" class="divide-y divide-gray-100">
+                            <tr><td colspan="5" class="p-3 text-center text-gray-500">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal เพิ่มเกษตรกร -->
+    <div id="addFarmerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+            <h3 class="text-xl font-bold mb-4">เพิ่มบัญชีเกษตรกรใหม่</h3>
+            <form id="addFarmerForm" onsubmit="submitNewFarmer(event)">
+                <input type="text" id="newUsername" required class="border rounded w-full py-2 px-3 mb-4 focus:ring-2 focus:ring-blue-400 outline-none" placeholder="ชื่อผู้ใช้">
+                <input type="password" id="newPassword" required class="border rounded w-full py-2 px-3 mb-4 focus:ring-2 focus:ring-blue-400 outline-none" placeholder="รหัสผ่าน">
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeModal()" class="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded transition">ยกเลิก</button>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow transition">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('execNameDisplay').textContent = localStorage.getItem('username') || 'ผู้บริหาร';
+
+        let typeChartInstance = null;
+        let statusChartInstance = null;
+
+        // --- ส่วนจัดการเกษตรกร ---
+        async function fetchFarmersData() {
+            try {
+                const response = await fetch('http://localhost:3000/api/farmers?t=' + new Date().getTime());
+                const farmers = await response.json();
+                document.getElementById('totalFarmersCount').innerHTML = `${farmers.length} <span class="text-xs font-normal text-gray-500">ราย</span>`;
+                const tbody = document.getElementById('farmerTableBody');
+                tbody.innerHTML = '';
+                farmers.forEach(f => {
+                    tbody.innerHTML += `
+                        <tr class="farmer-row">
+                            <td class="p-3 text-xs text-gray-500">${String(f.id).substring(0, 8)}...</td>
+                            <td class="p-3 font-medium farmer-name">${f.username}</td>
+                            <td class="p-3 text-right">
+                                <button onclick="editFarmer('${f.id}', '${f.username}')" class="text-blue-500 hover:text-blue-700 mr-3 transition"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteFarmer('${f.id}')" class="text-red-500 hover:text-red-700 transition"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        function filterFarmers() {
+            const input = document.getElementById('searchFarmer').value.toLowerCase();
+            const rows = document.querySelectorAll('.farmer-row');
+            rows.forEach(row => {
+                const name = row.querySelector('.farmer-name').textContent.toLowerCase();
+                row.style.display = name.includes(input) ? '' : 'none';
+            });
+        }
+
+        async function deleteFarmer(id) {
+            if(!confirm('ยืนยันการลบเกษตรกรรายนี้?')) return;
+            await fetch(`http://localhost:3000/api/farmers/${id}`, { method: 'DELETE' });
+            fetchFarmersData();
+        }
+
+        async function editFarmer(id, oldUsername) {
+            const newName = prompt("แก้ไขชื่อผู้ใช้:", oldUsername);
+            if(!newName) return;
+            const newPass = prompt("ใส่รหัสผ่านใหม่ (ว่างไว้ถ้าไม่เปลี่ยน):");
+            const payload = { username: newName };
+            if(newPass) payload.password = newPass;
+            await fetch(`http://localhost:3000/api/farmers/${id}`, {
+                method: 'PATCH', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+            });
+            fetchFarmersData();
+        }
+
+        // --- ส่วนจัดการรายการจัดซื้อ & กราฟ ---
+        async function fetchApprovedLots() {
+            const tbody = document.getElementById('prTableBody');
+            try {
+                const response = await fetch('http://localhost:3000/api/coffee?t=' + new Date().getTime());
+                const lots = await response.json();
+                
+                const displayLots = lots.filter(l => l.status === 'APPROVED' || l.status === 'PAID');
+                
+                let pendingCount = 0;
+                let totalWeight = 0;
+                let totalPaid = 0;
+
+                tbody.innerHTML = '';
+                if (displayLots.length === 0) tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-gray-500">ไม่มีรายการ</td></tr>';
+
+                displayLots.forEach(lot => {
+                    const price = lot.weight * 20;
+                    totalWeight += lot.weight;
+
+                    if (lot.status === 'PAID') {
+                        totalPaid += price;
+                    } else if (lot.status === 'APPROVED') {
+                        pendingCount++;
+                    }
+                    
+                    const isPaid = lot.status === 'PAID';
+                    
+                    const tr = document.createElement('tr');
+                    tr.classList.add('hover:bg-gray-50');
+                    tr.innerHTML = `
+                        <td class="p-3 text-xs text-gray-500">PR-${String(lot.id).padStart(4, '0')}</td>
+                        <td class="p-3 font-medium">${lot.farmerName}</td>
+                        <td class="p-3 text-center text-xs text-gray-600">${lot.coffeeType || 'ไม่ระบุ'}</td>
+                        <td class="p-3 text-right font-semibold text-gray-800">฿ ${price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                        <td class="p-3 text-center">
+                            ${isPaid 
+                                ? '<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold"><i class="fas fa-check-double"></i> จ่ายแล้ว</span>' 
+                                : `<button onclick="payLot(${lot.id})" class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600 shadow transition">จ่ายเงิน</button>`
+                            }
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // อัปเดตตัวเลขสรุป
+                document.getElementById('totalPRCount').innerHTML = `${pendingCount} <span class="text-xs font-normal text-gray-500">รายการ</span>`;
+                document.getElementById('totalWeightCount').innerHTML = `${totalWeight.toLocaleString(undefined, {maximumFractionDigits: 2})} <span class="text-xs font-normal text-gray-500">กก.</span>`;
+                document.getElementById('totalPaidCount').innerHTML = `฿ ${totalPaid.toLocaleString(undefined, {maximumFractionDigits: 2})}`;
+
+                // วาดกราฟ
+                renderCharts(displayLots);
+
+            } catch (e) { console.error(e); }
+        }
+
+        function renderCharts(lots) {
+            const typeData = {};
+            let pendingMoney = 0;
+            let paidMoney = 0;
+
+            lots.forEach(lot => {
+                const type = lot.coffeeType || 'ไม่ระบุ';
+                typeData[type] = (typeData[type] || 0) + lot.weight;
+
+                const price = lot.weight * 20;
+                if (lot.status === 'APPROVED') pendingMoney += price;
+                if (lot.status === 'PAID') paidMoney += price;
+            });
+
+            // 1. กราฟโดนัท (สายพันธุ์)
+            const ctxType = document.getElementById('typeChart').getContext('2d');
+            if (typeChartInstance) typeChartInstance.destroy();
+            typeChartInstance = new Chart(ctxType, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(typeData),
+                    datasets: [{
+                        data: Object.values(typeData),
+                        backgroundColor: ['#f97316', '#eab308', '#84cc16', '#06b6d4', '#8b5cf6']
+                    }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+            });
+
+            // 2. กราฟแท่ง (การจ่ายเงิน)
+            const ctxStatus = document.getElementById('statusChart').getContext('2d');
+            if (statusChartInstance) statusChartInstance.destroy();
+            statusChartInstance = new Chart(ctxStatus, {
+                type: 'bar',
+                data: {
+                    labels: ['รอโอนเงิน', 'จ่ายแล้ว'],
+                    datasets: [{
+                        label: 'ยอดเงิน (บาท)',
+                        data: [pendingMoney, paidMoney],
+                        backgroundColor: ['#facc15', '#22c55e'],
+                        borderRadius: 4
+                    }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
+        async function payLot(id) {
+            if(!confirm('ยืนยันการจ่ายเงิน (Matching เสร็จสิ้น)?')) return;
+            try {
+                const res = await fetch(`http://localhost:3000/api/coffee/pay/${id}`, { method: 'PATCH' });
+                if(res.ok) fetchApprovedLots();
+            } catch (err) { alert('เกิดข้อผิดพลาด'); }
+        }
+
+        // --- Modal Logic ---
+        const modal = document.getElementById('addFarmerModal');
+        function openModal() { modal.classList.remove('hidden'); }
+        function closeModal() { modal.classList.add('hidden'); document.getElementById('addFarmerForm').reset(); }
+        
+        async function submitNewFarmer(e) {
+            e.preventDefault();
+            const u = document.getElementById('newUsername').value;
+            const p = document.getElementById('newPassword').value;
+            try {
+                const res = await fetch('http://localhost:3000/api/farmers', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: u, password: p })
+                });
+                if(res.ok) { closeModal(); fetchFarmersData(); }
+            } catch (err) { console.error(err); }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchFarmersData();
+            fetchApprovedLots();
+        });
+    </script>
+</body>
+</html>
