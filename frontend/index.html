@@ -102,7 +102,7 @@
           </div>
         </div>
 
-        <!-- 🟢 ปุ่มเปิดคู่มือการใช้งาน เพิ่มเข้ามาใหม่ -->
+        <!-- 🟢 ปุ่มเปิดคู่มือการใช้งาน (เปลี่ยนชื่อแล้ว) -->
         <div class="mt-6 text-center">
           <button 
             type="button" 
@@ -110,29 +110,29 @@
             class="inline-flex items-center justify-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-800 transition"
           >
             <i data-lucide="book-open" class="h-4 w-4"></i>
-            อ่านคู่มือการใช้งานระบบ
+            คู่มือการใช้งานและโครงสร้างระบบ
           </button>
         </div>
 
       </div>
     </section>
 
-    <!-- 🟢 หน้าต่างป๊อปอัป (Modal) คู่มือการใช้งาน (แบบละเอียด) -->
+    <!-- 🟢 หน้าต่างป๊อปอัป (Modal) คู่มือและโครงสร้างระบบ -->
     <div id="manualModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
       <div id="manualContent" class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col transform scale-95 transition-transform duration-300">
         
         <!-- ส่วนหัว (Header) -->
         <div class="flex items-center justify-between p-5 border-b border-slate-100">
           <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <i data-lucide="book-open" class="h-6 w-6 text-emerald-600"></i>
-            คู่มือการใช้งานระบบ NPB Smart Coffee
+            <i data-lucide="layers" class="h-6 w-6 text-emerald-600"></i>
+            คู่มือการใช้งาน & โครงสร้างระบบ
           </h3>
           <button onclick="closeManual()" class="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-2 rounded-full transition">
             <i data-lucide="x" class="h-5 w-5"></i>
           </button>
         </div>
 
-        <!-- ส่วนเนื้อหาคู่มือ (เลื่อนอ่านได้) -->
+        <!-- ส่วนเนื้อหา (เลื่อนอ่านได้) -->
         <div class="p-6 overflow-y-auto space-y-6 text-slate-600 text-sm leading-relaxed">
           
           <div class="bg-emerald-50 text-emerald-700 p-3 rounded-lg border border-emerald-100 mb-4 text-xs">
@@ -148,7 +148,6 @@
             <ul class="list-disc pl-5 space-y-1.5">
               <li><strong>การเข้าสู่ระบบ:</strong> ใช้บัญชีที่ได้รับมอบหมาย (เช่น <code>farmer01</code>) เพื่อเข้าสู่หน้าแดชบอร์ดส่วนตัว</li>
               <li><strong>การตรวจสอบประวัติ:</strong> สามารถดูตาราง "ประวัติการส่งมอบ" ของตนเองได้แบบเรียลไทม์</li>
-              <li><strong>ข้อมูลที่ตรวจสอบได้:</strong> วันที่และเวลาส่งมอบ, ชนิด/สายพันธุ์กาแฟ, น้ำหนักสุทธิ, และค่าความชื้น</li>
               <li><strong>สถานะและยอดเงิน:</strong> ติดตามสถานะประเมิน (ผ่านเกณฑ์/ไม่ผ่าน) หากผ่านเกณฑ์ ระบบจะแสดงยอดเงินที่ได้รับ พร้อมสถานะ <b>"รอโอนเงิน"</b> หรือ <b>"จ่ายแล้ว"</b> ทันที</li>
             </ul>
           </div>
@@ -162,9 +161,9 @@
             </h4>
             <p class="text-xs text-slate-500 mb-2 font-medium">วัตถุประสงค์: บันทึกข้อมูลรับซื้อหน้าลาน และประเมินเกรดวัตถุดิบอัตโนมัติ</p>
             <ul class="list-disc pl-5 space-y-1.5">
-              <li><strong>ขั้นตอนการบันทึก (Walk-in):</strong> ระบุชื่อเกษตรกร, เลือกสายพันธุ์กาแฟ (เช่น อาราบิก้า, พีเบอร์รี่), ระบุน้ำหนัก (จำกัดไม่เกิน 10,000 กก./คิว) และค่าความชื้น</li>
+              <li><strong>ขั้นตอนการบันทึก (Walk-in):</strong> ระบุชื่อเกษตรกร, เลือกสายพันธุ์กาแฟ, ระบุน้ำหนัก (จำกัดไม่เกิน 10,000 กก./คิว) และค่าความชื้น</li>
               <li><strong>เกณฑ์ประเมินอัตโนมัติ:</strong> ระบบจะประเมินผ่านเกณฑ์ก็ต่อเมื่อ <b>ค่าความชื้นต้องไม่เกิน 12%</b> หากเกินกว่านี้ระบบจะปัดตกเป็นสถานะ "ไม่ผ่าน" อัตโนมัติ</li>
-              <li><strong>การจัดการข้อมูล:</strong> หากเจ้าหน้าที่บันทึกข้อมูลผิดพลาด สามารถกดปุ่ม <b>"ลบ" (สีแดง)</b> ในตารางประวัติการตรวจรับล่าสุดเพื่อล้างคิวที่ผิดพลาดได้ทันที</li>
+              <li><strong>การจัดการข้อมูล:</strong> มีสิทธิ์ลบข้อมูลในตารางประวัติการตรวจรับล่าสุดเพื่อล้างคิวที่บันทึกผิดพลาดได้ทันที</li>
             </ul>
           </div>
 
@@ -177,10 +176,59 @@
             </h4>
             <p class="text-xs text-slate-500 mb-2 font-medium">วัตถุประสงค์: ดูภาพรวมธุรกิจ อนุมัติสั่งจ่ายเงิน และนำสถิติไปวิเคราะห์</p>
             <ul class="list-disc pl-5 space-y-1.5">
-              <li><strong>สรุปข้อมูลภาพรวม:</strong> ตรวจสอบจำนวนเกษตรกร, จำนวนคิวที่รออนุมัติ, ปริมาณรับซื้อผ่านเกณฑ์ และยอดจ่ายเงินสดรวมทั้งหมด</li>
-              <li><strong>สถิติ (Real-time Charts):</strong> ตรวจสอบกราฟวงกลมแสดงสัดส่วนปริมาณการรับซื้อตามสายพันธุ์ และกราฟแท่งแสดงกระแสเงินสด (ยอดรอโอน เทียบกับ ยอดจ่ายแล้ว)</li>
-              <li><strong>การอนุมัติสั่งจ่ายเงิน:</strong> ตรวจสอบรายการจัดซื้อที่ผ่าน QC ในตารางด้านล่าง และกดปุ่ม <b>"จ่ายเงิน" (สีน้ำเงิน)</b> เพื่ออนุมัติ ระบบจะเปลี่ยนสถานะเป็น "จ่ายแล้ว" ไปยังฝั่งเกษตรกรอัตโนมัติ</li>
+              <li><strong>สรุปข้อมูลภาพรวม:</strong> ตรวจสอบจำนวนเกษตรกร, จำนวนคิวรออนุมัติ, ปริมาณรับซื้อผ่านเกณฑ์ และยอดจ่ายเงินสดรวม</li>
+              <li><strong>สถิติ (Charts):</strong> วิเคราะห์กราฟสัดส่วนปริมาณการรับซื้อตามสายพันธุ์ และกราฟแท่งกระแสเงินสดแบบ Real-time</li>
+              <li><strong>การอนุมัติสั่งจ่ายเงิน:</strong> ตรวจสอบรายการจัดซื้อที่ผ่าน QC แล้วกดปุ่ม <b>"จ่ายเงิน"</b> เพื่ออนุมัติและเปลี่ยนสถานะไปยังฝั่งเกษตรกร</li>
             </ul>
+          </div>
+
+          <hr class="border-slate-100">
+
+          <!-- 🟢 ส่วนที่เพิ่มใหม่: โครงสร้างระบบ (System Architecture) -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <h4 class="text-slate-800 font-bold text-base mb-3 flex items-center gap-2">
+              <i data-lucide="server" class="h-4 w-4 text-slate-600"></i> 4. โครงสร้างและเทคโนโลยีระบบ (System Architecture)
+            </h4>
+            <p class="text-xs text-slate-500 mb-3 font-medium">ภาพรวมของ Tech Stack ที่ใช้ในการพัฒนาโปรเจกต์</p>
+            
+            <div class="grid sm:grid-cols-2 gap-4">
+              <!-- Frontend -->
+              <div>
+                <h5 class="text-sm font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+                  <i data-lucide="monitor" class="h-3.5 w-3.5 text-blue-500"></i> ส่วนแสดงผล (Frontend)
+                </h5>
+                <ul class="list-disc pl-5 space-y-1 text-xs text-slate-600">
+                  <li><b>UI & Styling:</b> HTML5, Tailwind CSS</li>
+                  <li><b>Logic:</b> Vanilla JavaScript (ES6)</li>
+                  <li><b>Icons:</b> Lucide Icons</li>
+                  <li><b>Hosting:</b> GitHub Pages</li>
+                </ul>
+              </div>
+              
+              <!-- Backend -->
+              <div>
+                <h5 class="text-sm font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+                  <i data-lucide="database" class="h-3.5 w-3.5 text-emerald-500"></i> ส่วนประมวลผล (Backend)
+                </h5>
+                <ul class="list-disc pl-5 space-y-1 text-xs text-slate-600">
+                  <li><b>Server:</b> Node.js & Express.js</li>
+                  <li><b>Database:</b> PostgreSQL (บริหารด้วย Prisma ORM)</li>
+                  <li><b>API:</b> RESTful API</li>
+                  <li><b>Hosting:</b> Render.com</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="mt-3 pt-3 border-t border-slate-200">
+              <h5 class="text-sm font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+                <i data-lucide="shield-check" class="h-3.5 w-3.5 text-orange-500"></i> ความปลอดภัยและการสื่อสาร (Security & Comms)
+              </h5>
+              <ul class="list-disc pl-5 space-y-1 text-xs text-slate-600">
+                <li><b>Authentication:</b> ตรวจสอบสิทธิ์ผ่าน JWT (JSON Web Token)</li>
+                <li><b>State Management:</b> จัดการ Session ผ่าน <code>localStorage</code></li>
+                <li><b>Data Fetching:</b> เชื่อมต่อหน้าบ้านและหลังบ้านด้วย Fetch API & CORS</li>
+              </ul>
+            </div>
           </div>
 
         </div>
